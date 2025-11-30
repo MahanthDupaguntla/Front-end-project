@@ -31,6 +31,9 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.7",
+    "@types/react-toastify": "^4.0.2",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.1",

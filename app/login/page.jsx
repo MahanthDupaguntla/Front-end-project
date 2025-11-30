@@ -22,29 +22,41 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
-    const result = await login(email, password);
     
-    if (result.success) {
-      if (result.requiresOTP) {
-        // Admin user - show OTP dialog
-        toast.success(result.message || "OTP sent to your email", {
-          description: "Please check your email and enter the OTP",
-          duration: 5000,
-        });
-        setDemoOTP(result.otp); // Demo only - remove in production
-        setShowOTPDialog(true);
-      } else {
-        // Non-admin user - login directly
-        toast.success("Login successful!");
-        router.push("/dashboard");
-      }
-    } else {
-      toast.error(result.error || "Invalid credentials");
+    // Basic validation
+    if (!email || !password) {
+      toast.error("Please enter both email and password");
+      return;
     }
     
-    setLoading(false);
+    setLoading(true);
+
+    try {
+      const result = await login(email, password);
+      
+      if (result.success) {
+        if (result.requiresOTP) {
+          // Admin user - show OTP dialog
+          toast.success(result.message || "OTP sent to your email", {
+            description: "Please check your email and enter the OTP",
+            duration: 5000,
+          });
+          setDemoOTP(result.otp); // Demo only - remove in production
+          setShowOTPDialog(true);
+        } else {
+          // Non-admin user - login directly
+          toast.success("Login successful!");
+          router.push("/dashboard");
+        }
+      } else {
+        toast.error(result.error || "Invalid credentials. Please try again.");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("An unexpected error occurred. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleVerifyOTP = async (otpCode) => {
@@ -81,6 +93,19 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {/* Moved Demo credentials to the top */}
+            <div className="mb-6 pb-4 border-b">
+              <p className="text-sm text-gray-600 text-center mb-3">Demo Credentials:</p>
+              <div className="space-y-2 text-xs bg-gray-50 p-3 rounded-lg">
+                <div>
+                  <strong>Admin:</strong> admin@campus.edu / admin123
+                </div>
+                <div>
+                  <strong>Student:</strong> student@campus.edu / student123
+                </div>
+              </div>
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
@@ -112,19 +137,6 @@ export default function LoginPage() {
                 {loading ? "Signing in..." : "Sign in"}
               </Button>
             </form>
-
-            {/* Demo credentials */}
-            <div className="mt-6 pt-6 border-t">
-              <p className="text-sm text-gray-600 text-center mb-3">Demo Credentials:</p>
-              <div className="space-y-2 text-xs bg-gray-50 p-3 rounded-lg">
-                <div>
-                  <strong>Admin:</strong> admin@campus.edu / admin123
-                </div>
-                <div>
-                  <strong>Student:</strong> student@campus.edu / student123
-                </div>
-              </div>
-            </div>
           </CardContent>
         </Card>
 
